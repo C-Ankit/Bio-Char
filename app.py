@@ -48,9 +48,9 @@ prices2 = [current_price_Bio]
 upper_limits2 = [price_upper_limit2]
 lower_limits2 = [price_lower_limit2]
 
-prices3 = []
-upper_limits3 = []
-lower_limits3 = []
+prices3 = [0]
+upper_limits3 = [0]
+lower_limits3 = [0]
 
 # Set the random seed
 np.random.seed(12)
