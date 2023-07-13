@@ -32,6 +32,7 @@ growth_rate2 = st.number_input("Enter the price growth of Biochar")
 st.write('')  # or st.write(' ')
 
 # Details of Carbon Credit Pricing
+carbon_year = st.number_input("Enter the expected year of implementation of Carbon Credit Pricing")
 current_price_carbon = st.number_input("Enter the Price of Carbon Credit")
 price_upper_limit3 = st.number_input("Enter the upper cap of Carbon Credit price")
 price_lower_limit3 = st.number_input("Enter the lower cap of Carbon Credit price")
@@ -47,9 +48,9 @@ prices2 = [current_price_Bio]
 upper_limits2 = [price_upper_limit2]
 lower_limits2 = [price_lower_limit2]
 
-prices3 = [current_price_carbon]
-upper_limits3 = [price_upper_limit3]
-lower_limits3 = [price_lower_limit3]
+prices3 = []
+upper_limits3 = []
+lower_limits3 = []
 
 # Set the random seed
 np.random.seed(12)
@@ -58,8 +59,10 @@ st.write('')  # or st.write(' ')
 st.write('')  # or st.write(' ')
 st.write('')  # or st.write(' ')
 
+# Set the range of years for observation
 start_range, end_range = st.slider('Select the Years of forecast: ', 2023, 2050, (2023, 2040), step=1)
 years = range(start_range, end_range)
+
 if st.button("Get results"):
     # Loop to calculate the values
     for year in years[1:]:
@@ -89,17 +92,27 @@ if st.button("Get results"):
         lower_limits2.append(projected_lower_limit2)
 
         # For Carbon Credits Price
-        projected_price3 = prices3[-1] * (1 + growth_rate3)
-        projected_upper_limit3 = upper_limits3[-1] * (1 + growth_rate3)
-        projected_lower_limit3 = lower_limits3[-1] * (1 + growth_rate3)
+        if year == carbon_year:
+            prices3.append(current_price_carbon)
+            upper_limits3.append(price_upper_limit3)
+            lower_limits3.append(price_lower_limit3)
 
-        projected_price3 += np.random.normal(0, 1) * prices3[-1] * 0.03
-        projected_upper_limit3 += np.random.normal(0, 1) * upper_limits3[-1] * 0.03
-        projected_lower_limit3 += np.random.normal(0, 1) * lower_limits3[-1] * 0.03
+        elif year > carbon_year:
+            projected_price3 = prices3[-1] * (1 + growth_rate3)
+            projected_upper_limit3 = upper_limits3[-1] * (1 + growth_rate3)
+            projected_lower_limit3 = lower_limits3[-1] * (1 + growth_rate3)
 
-        prices3.append(projected_price3)
-        upper_limits3.append(projected_upper_limit3)
-        lower_limits3.append(projected_lower_limit3)
+            projected_price3 += np.random.normal(0, 1) * prices3[-1] * 0.03
+            projected_upper_limit3 += np.random.normal(0, 1) * upper_limits3[-1] * 0.03
+            projected_lower_limit3 += np.random.normal(0, 1) * lower_limits3[-1] * 0.03
+
+            prices3.append(projected_price3)
+            upper_limits3.append(projected_upper_limit3)
+            lower_limits3.append(projected_lower_limit3)
+        else:
+            prices3.append(0)  # Set carbon credit price to 0 before implementation
+            upper_limits3.append(0)
+            lower_limits3.append(0)
 
     # 2.91 is the factor received from Teammate that accounts for the difference in Carbon Emissions due to
     # Coke in Comparison to Biochar
@@ -110,7 +123,7 @@ if st.button("Get results"):
     lower_limits4 = [x + (y * 2.91) for x, y in zip(lower_limits, lower_limits3)]
 
     # Convert range object to a list
-    years = list(range(2025, 2041))
+    years = list(range(start_range, end_range))
 
     # Create the figure
     fig = go.Figure()
